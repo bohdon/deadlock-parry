@@ -1,0 +1,35 @@
+.DS_Store
+Thumbs.db
+
+# Python
+*.py[co]
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+deb_dist
+develop-eggs
+.installed.cfg
+
+# Unit test / coverage reports
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+.hypothesis/
+
+# Editor Settings
+.vscode/
+.idea/
