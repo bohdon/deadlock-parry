@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import os.path
 import random
+import statistics
 import time
 
 import click
@@ -17,6 +18,12 @@ _file_dir = os.path.dirname(__file__)
 
 LOG = logging.getLogger()
 logging.basicConfig(format="%(asctime)s %(levelname)-8s %(message)s", level=logging.INFO)
+
+
+class ParryResult(object):
+    def __init__(self, success: bool, response_time: float = 0):
+        self.success = success
+        self.response_time = response_time
 
 
 class PunchGame(object):
@@ -41,6 +48,9 @@ class PunchGame(object):
         self._window: pygame.Surface | None = None
         self._hwnd = None
         self._last_active_hwnd = None
+
+        # a record of all results
+        self.results: list[ParryResult] = []
 
     def play_sound(self, name):
         path = os.path.join(_file_dir, "audio", f"{name}.wav")
@@ -151,13 +161,31 @@ class PunchGame(object):
     def parry(self):
         time_ms = round((time.time() - self._punch_start_time) * 1000)
         LOG.info(f"Parry success: {time_ms}ms")
+        self.results.append(ParryResult(True, time_ms))
+
         self.play_sound(self.PARRY_SOUND)
         self.reset_punch()
 
+        self.log_results_summary()
+
     def fail_parry(self):
         LOG.info("Parry failed, you died.")
+        self.results.append(ParryResult(False))
+
         self.play_sound(self.HIT_SOUND)
         self.reset_punch()
+
+        self.log_results_summary()
+
+    def log_results_summary(self):
+        successful_results = [r for r in self.results if r.success]
+        num_total = len(self.results)
+        num_success = len(successful_results)
+        avg_response = 0
+        if successful_results:
+            avg_response = round(statistics.fmean([r.response_time for r in successful_results]))
+        success_rate = num_success / float(num_total)
+        LOG.info(f"{num_success} / {num_total} ({success_rate * 100:.2f}%), average response: {avg_response}ms")
 
 
 @click.command()
