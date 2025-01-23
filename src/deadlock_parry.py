@@ -12,12 +12,16 @@ import win32com.client
 import win32con
 import win32gui
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 _file_dir = os.path.dirname(__file__)
 
 LOG = logging.getLogger()
 logging.basicConfig(format="%(asctime)s %(levelname)-8s %(message)s", level=logging.INFO)
+
+DEFAULT_DELAY_MIN = 15
+DEFAULT_DELAY_MAX = 240
+DEFAULT_PARRY_WINDOW = 600
 
 
 class ParryResult(object):
@@ -33,11 +37,11 @@ class PunchGame(object):
 
     def __init__(self):
         # minimum delay between punches, in seconds
-        self.delay_min = 30
+        self.delay_min = DEFAULT_DELAY_MIN
         # maximum delay between punches, in seconds
-        self.delay_max = 300
+        self.delay_max = DEFAULT_DELAY_MAX
         # the maximum number of milliseconds allowed before the parry fails
-        self.parry_window = 750
+        self.parry_window = DEFAULT_PARRY_WINDOW
         # the key binding for parry
         self.parry_key = pygame.K_f
 
@@ -201,22 +205,22 @@ class PunchGame(object):
     "-m",
     "--delay-min",
     type=int,
-    default=30,
-    help="The minimum delay before a random punch, in seconds",
+    default=DEFAULT_DELAY_MIN,
+    help=f"The minimum delay before a random punch, in seconds (Default: {DEFAULT_DELAY_MIN})",
 )
 @click.option(
     "-x",
     "--delay-max",
     type=int,
-    default=300,
-    help="The maximum delay before a random punch, in seconds",
+    default=DEFAULT_DELAY_MAX,
+    help=f"The max delay before a random punch, in seconds (Default: {DEFAULT_DELAY_MAX})",
 )
 @click.option(
     "-w",
     "--parry-window",
     type=int,
-    default=600,
-    help="The maximum allowed duration for parrying before being hit, in milliseconds",
+    default=DEFAULT_PARRY_WINDOW,
+    help=f"The max duration for parrying before being hit, in milliseconds (Default: {DEFAULT_PARRY_WINDOW})",
 )
 @click.option(
     "-k",

@@ -7,12 +7,12 @@ Usage: deadlock_parry.exe [OPTIONS]
 
 Options:
   -m, --delay-min INTEGER     The minimum delay before a random punch, in
-                              seconds (Default: 30)
-  -x, --delay-max INTEGER     The maximum delay before a random punch, in
-                              seconds (Default: 300)
-  -w, --parry-window INTEGER  The maximum allowed duration for parrying before
-                              being hit, in milliseconds (Default: 600)
-  -k, --parry-key TEXT        The key binding for parry (Default: F)
+                              seconds (Default: 15)
+  -x, --delay-max INTEGER     The max delay before a random punch, in seconds
+                              (Default: 240)
+  -w, --parry-window INTEGER  The max duration for parrying before being hit,
+                              in milliseconds (Default: 600)
+  -k, --parry-key TEXT        The key binding for parry
   --help                      Show this message and exit.
 ```
 
