@@ -11,6 +11,6 @@ Options:
   -x, --delay-max INTEGER     The maximum delay before a random punch, in
                               seconds (Default: 300)
   -w, --parry-window INTEGER  The maximum allowed duration for parrying before
-                              being hit, in milliseconds (Default: 750)
+                              being hit, in milliseconds (Default: 600)
   --help                      Show this message and exit.
 ```

@@ -179,7 +179,7 @@ class PunchGame(object):
     "-w",
     "--parry-window",
     type=int,
-    default=500,
+    default=600,
     help="The maximum allowed duration for parrying before being hit, in milliseconds",
 )
 def main(delay_min, delay_max, parry_window):
