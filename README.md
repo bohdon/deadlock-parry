@@ -12,5 +12,6 @@ Options:
                               seconds (Default: 300)
   -w, --parry-window INTEGER  The maximum allowed duration for parrying before
                               being hit, in milliseconds (Default: 600)
+  -k, --parry-key TEXT        The key binding for parry (Default: F)
   --help                      Show this message and exit.
 ```

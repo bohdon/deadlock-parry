@@ -12,7 +12,7 @@ import win32com.client
 import win32con
 import win32gui
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 _file_dir = os.path.dirname(__file__)
 
@@ -38,6 +38,8 @@ class PunchGame(object):
         self.delay_max = 300
         # the maximum number of milliseconds allowed before the parry fails
         self.parry_window = 750
+        # the key binding for parry
+        self.parry_key = pygame.K_f
 
         # the next time a punch should be triggered
         self._next_punch_time = -1
@@ -52,6 +54,16 @@ class PunchGame(object):
         # a record of all results
         self.results: list[ParryResult] = []
 
+        pygame.init()
+        pygame.mixer.init()
+
+    def set_parry_key(self, name: str):
+        try:
+            self.parry_key = pygame.key.key_code(name)
+        except ValueError:
+            LOG.warning(f"Unknown key name: {name}")
+            pass
+
     def play_sound(self, name):
         path = os.path.join(_file_dir, "audio", f"{name}.wav")
         sound = pygame.mixer.Sound(path)
@@ -61,10 +73,8 @@ class PunchGame(object):
         LOG.info(f"Starting parry practice")
         LOG.info(f"Delay: {self.delay_min}..{self.delay_max}s")
         LOG.info(f"Parry Window: {self.parry_window}ms")
+        LOG.info(f"Parry Key: {pygame.key.name(self.parry_key)}")
         LOG.info(f"Press Ctrl + C to quit.")
-
-        pygame.init()
-        pygame.mixer.init()
 
         # create a display to capture input
         self._window = pygame.display.set_mode()
@@ -88,19 +98,21 @@ class PunchGame(object):
         while run:
             self._window.fill(0)
 
+            # listen for parry input
+            did_parry = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
-                if event.type == pygame.KEYDOWN:
+                elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.deactivate_window()
-                    if event.key == pygame.K_c:
+                    elif event.key == pygame.K_c:
                         if event.mod & pygame.KMOD_CTRL:
                             LOG.info(f"Received Ctrl + C, exiting...")
                             run = False
+                    elif event.key == self.parry_key:
+                        did_parry = True
                     LOG.debug(f"KEYDOWN: {event.dict}")
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    LOG.debug(f"MOUSEBUTTONDOWN: {event.dict}")
 
             if not self._is_punching:
                 if self._next_punch_time < 0:
@@ -113,7 +125,7 @@ class PunchGame(object):
             if self._is_punching:
                 elapsed_time_ms = (time.time() - self._punch_start_time) * 1000
                 # check for key press
-                if self.is_parry_key_pressed():
+                if did_parry:
                     self.parry()
                 elif elapsed_time_ms >= self.parry_window:
                     self.fail_parry()
@@ -136,7 +148,7 @@ class PunchGame(object):
     def schedule_punch(self):
         random_delay = random.uniform(self.delay_min, self.delay_max)
         self._next_punch_time = time.time() + random_delay
-        LOG.info(f"Scheduled punch in {random_delay:.2f}s")
+        LOG.debug(f"Next punch in {random_delay:.2f}s")
 
     def punch(self):
         # activate game window
@@ -146,17 +158,13 @@ class PunchGame(object):
         self._is_punching = True
         self._punch_start_time = time.time()
 
-        LOG.info(f"Punch started {self._punch_start_time}")
+        LOG.debug(f"Punch")
 
     def reset_punch(self):
         self._is_punching = False
         self._next_punch_time = -1
         # hide the game window
         self.deactivate_window()
-
-    def is_parry_key_pressed(self):
-        keys = pygame.key.get_pressed()
-        return keys[pygame.K_f]
 
     def parry(self):
         time_ms = round((time.time() - self._punch_start_time) * 1000)
@@ -210,11 +218,18 @@ class PunchGame(object):
     default=600,
     help="The maximum allowed duration for parrying before being hit, in milliseconds",
 )
-def main(delay_min, delay_max, parry_window):
+@click.option(
+    "-k",
+    "--parry-key",
+    default="f",
+    help="The key binding for parry",
+)
+def main(delay_min, delay_max, parry_window, parry_key):
     timer = PunchGame()
     timer.delay_min = delay_min
     timer.delay_max = delay_max
     timer.parry_window = parry_window
+    timer.set_parry_key(parry_key)
     timer.start()
 
 
