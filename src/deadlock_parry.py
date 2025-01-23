@@ -11,10 +11,12 @@ import win32com.client
 import win32con
 import win32gui
 
+__version__ = "1.0.1"
+
 _file_dir = os.path.dirname(__file__)
 
 LOG = logging.getLogger()
-logging.basicConfig(format="%(asctime)s %(levelname)-8s %(message)s", level=logging.DEBUG)
+logging.basicConfig(format="%(asctime)s %(levelname)-8s %(message)s", level=logging.INFO)
 
 
 class PunchGame(object):
@@ -49,7 +51,7 @@ class PunchGame(object):
         LOG.info(f"Starting parry practice")
         LOG.info(f"Delay: {self.delay_min}..{self.delay_max}s")
         LOG.info(f"Parry Window: {self.parry_window}ms")
-        LOG.info(f"Press Escape to quit.")
+        LOG.info(f"Press Ctrl + C to quit.")
 
         pygame.init()
         pygame.mixer.init()
@@ -81,7 +83,11 @@ class PunchGame(object):
                     run = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        run = False
+                        self.deactivate_window()
+                    if event.key == pygame.K_c:
+                        if event.mod & pygame.KMOD_CTRL:
+                            LOG.info(f"Received Ctrl + C, exiting...")
+                            run = False
                     LOG.debug(f"KEYDOWN: {event.dict}")
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     LOG.debug(f"MOUSEBUTTONDOWN: {event.dict}")
